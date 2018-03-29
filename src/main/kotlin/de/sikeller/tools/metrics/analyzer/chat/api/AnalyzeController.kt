@@ -1,4 +1,4 @@
-package de.sikeller.tools.chatMetricsAnalzyer.api
+package de.sikeller.tools.metrics.analyzer.chat.api
 
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping

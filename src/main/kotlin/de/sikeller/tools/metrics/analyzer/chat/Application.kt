@@ -1,4 +1,4 @@
-package de.sikeller.tools.chatMetricsAnalzyer
+package de.sikeller.tools.metrics.analyzer.chat
 
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
