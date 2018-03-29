@@ -1,0 +1,2 @@
+rootProject.name = 'chat-metrics-analyzer'
+rootProject.buildFileName = 'build.gradle'
