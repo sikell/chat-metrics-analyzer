@@ -1,15 +1,16 @@
 package de.sikeller.tools.metrics.chat.api
 
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import de.sikeller.tools.metrics.chat.core.ChatTransformer
+import de.sikeller.tools.metrics.chat.core.model.Chat
+import org.springframework.http.MediaType
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("analyze")
-class AnalyzeController {
+class AnalyzeController(val transformer: ChatTransformer) {
 
-    @GetMapping("/")
-    fun analyze(): String {
-        return "Hello world"
+    @PostMapping(value= ["/"], consumes = [MediaType.TEXT_PLAIN_VALUE])
+    fun analyze(@RequestBody input:String): Chat {
+        return transformer.transform(input)
     }
 }
