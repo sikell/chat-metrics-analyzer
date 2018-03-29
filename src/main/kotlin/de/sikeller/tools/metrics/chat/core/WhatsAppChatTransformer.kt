@@ -4,6 +4,7 @@ import de.sikeller.tools.metrics.chat.core.model.Chat
 import de.sikeller.tools.metrics.chat.core.model.ErrorMessage
 import de.sikeller.tools.metrics.chat.core.model.Message
 import de.sikeller.tools.metrics.chat.core.model.Person
+import de.sikeller.tools.metrics.chat.core.model.SimpleMessage
 import org.springframework.stereotype.Component
 import java.text.SimpleDateFormat
 import java.util.*
@@ -34,19 +35,18 @@ class WhatsAppChatTransformer : ChatTransformer {
                 val message = matcher.group(3)
                 val parsedTimestamp = SimpleDateFormat("dd.MM.yyyy HH:mm:ss").parse(timestamp)
                 list.add(
-                        Message(
-                                parsedTimestamp,
-                                Person(person),
-                                message
-                        )
+                    SimpleMessage(
+                        parsedTimestamp,
+                        Person(person),
+                        message
+                    )
                 )
                 list
             }
         })
         return Chat(
-                messages,
-                messages.map { m -> m.sender }.toSet()
+            messages,
+            messages.map { m -> m.sender }.toSet()
         )
     }
-
 }

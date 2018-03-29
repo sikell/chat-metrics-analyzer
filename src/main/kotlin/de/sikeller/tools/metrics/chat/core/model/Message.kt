@@ -2,18 +2,12 @@ package de.sikeller.tools.metrics.chat.core.model
 
 import java.util.*
 
-open class Message(
-        val timestamp: Date,
-        val sender: Person,
-        open var message: String
-) {
-    fun append(input: String) {
-        message += input
+interface Message {
+    val timestamp: Date
+    val sender: Person
+    var message: String
+
+    fun append(messagePart: String) {
+        message += messagePart
     }
 }
-
-class ErrorMessage(override var message: String): Message(
-        message = message,
-        timestamp = Date(),
-        sender = Person("Error")
-)
