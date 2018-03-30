@@ -7,5 +7,5 @@ data class Mail(
     val subject: String,
     val sentDate: String,
     val message: String,
-    val attachments: List<String>
+    val attachments: List<Attachment>
 )

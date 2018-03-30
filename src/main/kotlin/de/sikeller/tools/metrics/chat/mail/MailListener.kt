@@ -1,5 +1,6 @@
 package de.sikeller.tools.metrics.chat.mail
 
+import de.sikeller.tools.metrics.chat.mail.model.Attachment
 import de.sikeller.tools.metrics.chat.mail.model.Mail
 import org.springframework.util.StringUtils
 import java.io.InputStream
@@ -86,7 +87,7 @@ class MailListener(
             ?.fold("", { s, a -> s.plus(a.address) })
             ?: ""
 
-    private fun getAttachments(message: Message): List<String> {
+    private fun getAttachments(message: Message): List<Attachment> {
         val multipart = message.content as Multipart
         return (0 until multipart.count)
             .map(multipart::getBodyPart)
@@ -95,7 +96,15 @@ class MailListener(
                 bodyPart.disposition != null
                     && bodyPart.disposition.toLowerCase() == Part.ATTACHMENT.toLowerCase()
                     && !StringUtils.isEmpty(bodyPart.fileName)
-            }.map { bodyPart -> convertStreamToString(bodyPart.inputStream) }
+            }.map { bodyPart ->
+            val content = convertStreamToString(bodyPart.inputStream)
+            Attachment(
+                name = bodyPart.fileName,
+                contentType = bodyPart.contentType,
+                description = bodyPart.description,
+                content = content
+            )
+        }
     }
 
     private fun convertStreamToString(inputStream: InputStream): String {
