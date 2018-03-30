@@ -15,9 +15,9 @@ class WhatsAppChatTransformer : ChatTransformer {
 
     override fun transform(input: String): Chat {
         val lines = input.lines()
+        val messageRegex = "^(\\d{2}\\.\\d{2}\\.\\d{4}\\s\\d{2}:\\d{2}:\\d{2}):\\s([^:]+):\\s(.+)"
+        val pattern = Pattern.compile(messageRegex)
         val messages = lines.fold(LinkedList<Message>(), { list, line ->
-            val messageRegex = "^(\\d{2}\\.\\d{2}\\.\\d{4}\\s\\d{2}:\\d{2}:\\d{2}):\\s([^:]+):\\s(.+)"
-            val pattern = Pattern.compile(messageRegex)
             val matcher = pattern.matcher(line)
             if (!matcher.matches()) {
                 // this could be a next line message
