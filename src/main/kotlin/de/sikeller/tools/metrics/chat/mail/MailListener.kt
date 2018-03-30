@@ -1,13 +1,18 @@
 package de.sikeller.tools.metrics.chat.mail
 
 import de.sikeller.tools.metrics.chat.mail.model.Mail
+import org.springframework.util.StringUtils
+import java.io.InputStream
 import java.util.*
 import javax.mail.Address
 import javax.mail.Flags
 import javax.mail.Folder
+import javax.mail.Message
 import javax.mail.Message.RecipientType
 import javax.mail.MessagingException
+import javax.mail.Multipart
 import javax.mail.NoSuchProviderException
+import javax.mail.Part
 import javax.mail.Session
 import javax.mail.internet.InternetAddress
 
@@ -46,7 +51,7 @@ class MailListener(
                         subject = it.subject,
                         sentDate = it.sentDate.toString(),
                         message = content,
-                        attachments = emptyList()
+                        attachments = getAttachments(it)
                     )
                 }
 
@@ -80,4 +85,21 @@ class MailListener(
             ?.map { it as InternetAddress }
             ?.fold("", { s, a -> s.plus(a.address) })
             ?: ""
+
+    private fun getAttachments(message: Message): List<String> {
+        val multipart = message.content as Multipart
+        return (0 until multipart.count)
+            .map(multipart::getBodyPart)
+            .filter { bodyPart ->
+                // only handle attachment message parts
+                bodyPart.disposition != null
+                    && bodyPart.disposition.toLowerCase() == Part.ATTACHMENT.toLowerCase()
+                    && !StringUtils.isEmpty(bodyPart.fileName)
+            }.map { bodyPart -> convertStreamToString(bodyPart.inputStream) }
+    }
+
+    private fun convertStreamToString(inputStream: InputStream): String {
+        val s = Scanner(inputStream).useDelimiter("\\A")
+        return if (s.hasNext()) s.next() else ""
+    }
 }
