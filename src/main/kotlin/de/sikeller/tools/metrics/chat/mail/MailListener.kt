@@ -4,6 +4,7 @@ import de.sikeller.tools.metrics.chat.mail.model.Attachment
 import de.sikeller.tools.metrics.chat.mail.model.Mail
 import org.springframework.util.StringUtils
 import java.io.InputStream
+import java.io.InputStreamReader
 import java.util.*
 import javax.mail.Address
 import javax.mail.Flags
@@ -108,7 +109,16 @@ class MailListener(
     }
 
     private fun convertStreamToString(inputStream: InputStream): String {
-        val s = Scanner(inputStream).useDelimiter("\\A")
-        return if (s.hasNext()) s.next() else ""
+        val bufferSize = 1024
+        val buffer = CharArray(bufferSize)
+        val out = StringBuilder()
+        val inputStreamReader = InputStreamReader(inputStream, "UTF-8")
+        while (true) {
+            val rsz = inputStreamReader.read(buffer, 0, buffer.size)
+            if (rsz < 0)
+                break
+            out.append(buffer, 0, rsz)
+        }
+        return out.toString()
     }
 }
