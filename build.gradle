@@ -28,5 +28,7 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version" // Required for Kotlin integration
     compile "org.springframework.boot:spring-boot-starter-web:$spring_boot_version"
     compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.4.1"
+    compile "javax.mail:mail:1.5.0-b01"
+    compile "org.springframework.boot:spring-boot-configuration-processor:$spring_boot_version"
     testCompile "org.springframework.boot:spring-boot-starter-test:$spring_boot_version"
 }
