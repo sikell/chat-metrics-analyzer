@@ -20,6 +20,6 @@ class MailController(val mailListener: MailListener, val transformer: ChatTransf
     fun analyzeUnreadMails(): List<ChatMetric> = mailListener.getNewEmails()
         .filter { it.attachments.size == 1 }
         .flatMap { it.attachments }
-        .filter { it.name.startsWith("WhatsApp Chat mit ") && it.name.endsWith(".txt") }
+        .filter { it.name.startsWith("WhatsApp Chat ") && it.name.endsWith(".txt") }
         .map { calculator.calc(transformer.transform(it.content)) }
 }
