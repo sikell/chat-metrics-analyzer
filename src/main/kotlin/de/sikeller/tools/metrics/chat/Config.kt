@@ -10,7 +10,7 @@ class Config {
 
     @Bean
     fun mailListener(mailProperties: MailProperties): MailListener {
-        System.out.print("Mail listener created")
+        println("Mail listener created")
         val mailListener = MailListener()
         mailListener.getNewEmails(
             mailProperties.protocol,
