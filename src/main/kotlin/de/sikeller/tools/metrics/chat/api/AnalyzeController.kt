@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController
 class AnalyzeController(val transformer: ChatTransformer, val calculator: MetricCalculator) {
 
     @PostMapping(value = ["/"], consumes = [MediaType.TEXT_PLAIN_VALUE])
-    fun analyze(@RequestBody input: String): ChatMetric {
-        return calculator.calc(transformer.transform(input))
-    }
+    fun analyze(@RequestBody input: String): ChatMetric =
+        calculator.calc(transformer.transform(input))
 }

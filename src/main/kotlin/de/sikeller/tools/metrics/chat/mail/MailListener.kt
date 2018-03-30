@@ -1,5 +1,6 @@
 package de.sikeller.tools.metrics.chat.mail
 
+import de.sikeller.tools.metrics.chat.mail.model.Mail
 import java.util.*
 import javax.mail.Address
 import javax.mail.Flags
@@ -10,11 +11,17 @@ import javax.mail.NoSuchProviderException
 import javax.mail.Session
 import javax.mail.internet.InternetAddress
 
-class MailListener {
+class MailListener(
+    private val protocol: String,
+    private val host: String,
+    private val port: String,
+    private val userName: String,
+    private val password: String
+) {
 
     private val inbox = "INBOX"
 
-    fun getNewEmails(protocol: String, host: String, port: String, userName: String, password: String) {
+    fun getNewEmails(): List<Mail> {
         val properties = getServerProperties(protocol, host, port)
         val session = Session.getDefaultInstance(properties)
 
@@ -27,32 +34,33 @@ class MailListener {
 
             val count = inbox.messageCount
             val messages = inbox.getMessages(1, count)
-            for (message in messages) {
-                if (!message.flags.contains(Flags.Flag.SEEN)) {
-                    val fromAddresses = message.from
-                    println("...................")
-                    println("\t From: " + fromAddresses[0].toString())
-                    println("\t To: " + parseAddresses(message.getRecipients(RecipientType.TO)))
-                    println("\t CC: " + parseAddresses(message.getRecipients(RecipientType.CC)))
-                    println("\t Subject: " + message.subject)
-                    println("\t Sent Date:" + message.sentDate.toString())
-                    try {
-                        println(message.content)
-                    } catch (ex: Exception) {
-                        System.err.println("Error reading content !!")
-                        ex.printStackTrace()
-                    }
+            val mails = messages
+                .filter { !it.flags.contains(Flags.Flag.SEEN) }
+                .map {
+                    val fromAddresses = it.from
+                    val content = it.content.toString()
+                    Mail(
+                        from = fromAddresses[0].toString(),
+                        to = parseAddresses(it.getRecipients(RecipientType.TO)),
+                        cc = parseAddresses(it.getRecipients(RecipientType.CC)),
+                        subject = it.subject,
+                        sentDate = it.sentDate.toString(),
+                        message = content,
+                        attachments = emptyList()
+                    )
                 }
-            }
 
             inbox.close(false)
             store.close()
+            return mails
         } catch (ex: NoSuchProviderException) {
             println("No provider for protocol: " + protocol)
             ex.printStackTrace()
+            return emptyList()
         } catch (ex: MessagingException) {
             println("Could not connect to the message store")
             ex.printStackTrace()
+            return emptyList()
         }
     }
 
@@ -66,7 +74,7 @@ class MailListener {
         return properties
     }
 
-    private fun parseAddresses(address: Array<Address>?): String? =
+    private fun parseAddresses(address: Array<Address>?): String =
         address
             ?.filter { it is InternetAddress }
             ?.map { it as InternetAddress }

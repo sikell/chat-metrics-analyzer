@@ -7,18 +7,14 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 class Config {
-
     @Bean
     fun mailListener(mailProperties: MailProperties): MailListener {
-        println("Mail listener created")
-        val mailListener = MailListener()
-        mailListener.getNewEmails(
+        return MailListener(
             mailProperties.protocol,
             mailProperties.server,
             mailProperties.port,
             mailProperties.user,
             mailProperties.password
         )
-        return mailListener
     }
 }
