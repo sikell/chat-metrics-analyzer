@@ -5,15 +5,19 @@ import de.sikeller.tools.metrics.chat.core.model.ChatMetric
 import de.sikeller.tools.metrics.chat.core.model.EmojiMetric
 import de.sikeller.tools.metrics.chat.core.model.PersonMetric
 import de.sikeller.tools.metrics.chat.utils.EmojiHandler
+import de.sikeller.tools.metrics.chat.utils.OperationResult
+import de.sikeller.tools.metrics.chat.utils.TimeCalculation
 import org.springframework.stereotype.Component
 
 @Component
 class MetricCalculatorImpl(val emojiHandler: EmojiHandler) : MetricCalculator {
 
-    override fun calc(chat: Chat): ChatMetric {
-        return ChatMetric(
-            personMetrics = personMetric(chat)
-        )
+    override fun calc(chat: Chat): OperationResult<ChatMetric> {
+        return TimeCalculation().run {
+            ChatMetric(
+                personMetrics = personMetric(chat)
+            )
+        }
     }
 
     private fun personMetric(chat: Chat): List<PersonMetric> {
