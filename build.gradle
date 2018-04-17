@@ -31,6 +31,7 @@ dependencies {
     compile 'javax.mail:mail:1.5.0-b01'
     compile 'com.vdurmont:emoji-java:4.0.0'
     compile "org.springframework.boot:spring-boot-configuration-processor:$spring_boot_version"
+    compile 'org.apache.commons:commons-lang3:3.7'
     testCompile "org.springframework.boot:spring-boot-starter-test:$spring_boot_version"
     testCompile 'io.kotlintest:kotlintest-runner-junit5:3.0.0'
 }

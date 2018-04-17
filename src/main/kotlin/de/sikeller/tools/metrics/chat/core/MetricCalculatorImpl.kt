@@ -4,10 +4,13 @@ import de.sikeller.tools.metrics.chat.core.model.Chat
 import de.sikeller.tools.metrics.chat.core.model.ChatMetric
 import de.sikeller.tools.metrics.chat.core.model.EmojiMetric
 import de.sikeller.tools.metrics.chat.core.model.PersonMetric
+import de.sikeller.tools.metrics.chat.core.model.TimeMetric
 import de.sikeller.tools.metrics.chat.utils.EmojiHandler
 import de.sikeller.tools.metrics.chat.utils.OperationResult
 import de.sikeller.tools.metrics.chat.utils.TimeCalculation
+import org.apache.commons.lang3.time.DateUtils
 import org.springframework.stereotype.Component
+import java.util.*
 
 @Component
 class MetricCalculatorImpl(val emojiHandler: EmojiHandler) : MetricCalculator {
@@ -15,7 +18,8 @@ class MetricCalculatorImpl(val emojiHandler: EmojiHandler) : MetricCalculator {
     override fun calc(chat: Chat): OperationResult<ChatMetric> {
         return TimeCalculation().run {
             ChatMetric(
-                personMetrics = personMetric(chat)
+                personMetrics = personMetric(chat),
+                timeMetric = timeMetric(chat)
             )
         }
     }
@@ -57,5 +61,15 @@ class MetricCalculatorImpl(val emojiHandler: EmojiHandler) : MetricCalculator {
                         )
                     }.sortedByDescending(EmojiMetric::count)
             }
+    }
+
+    private fun timeMetric(chat: Chat): TimeMetric {
+        return TimeMetric(
+            communicationDensity = chat.messages
+                .groupingBy { m ->
+                    DateUtils.truncate(m.timestamp, Calendar.DAY_OF_MONTH)
+                }.eachCount()
+                .toMap()
+        )
     }
 }
