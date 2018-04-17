@@ -2,6 +2,7 @@ package de.sikeller.tools.metrics.chat.core
 
 import de.sikeller.tools.metrics.chat.core.model.Chat
 import de.sikeller.tools.metrics.chat.core.model.ChatMetric
+import de.sikeller.tools.metrics.chat.core.model.CommunicationDensity
 import de.sikeller.tools.metrics.chat.core.model.EmojiMetric
 import de.sikeller.tools.metrics.chat.core.model.PersonMetric
 import de.sikeller.tools.metrics.chat.core.model.TimeMetric
@@ -63,13 +64,15 @@ class MetricCalculatorImpl(val emojiHandler: EmojiHandler) : MetricCalculator {
             }
     }
 
-    private fun timeMetric(chat: Chat): TimeMetric {
-        return TimeMetric(
-            communicationDensity = chat.messages
-                .groupingBy { m ->
-                    DateUtils.truncate(m.timestamp, Calendar.DAY_OF_MONTH)
-                }.eachCount()
-                .toMap()
+    private fun timeMetric(chat: Chat): TimeMetric = TimeMetric(
+        communicationDensity = CommunicationDensity(
+            countPerDay = countPerDay(chat)
         )
-    }
+    )
+
+    private fun countPerDay(chat: Chat): Map<Date, Int> = chat.messages
+        .groupingBy { m ->
+            DateUtils.truncate(m.timestamp, Calendar.DAY_OF_MONTH)
+        }.eachCount()
+        .toMap()
 }
