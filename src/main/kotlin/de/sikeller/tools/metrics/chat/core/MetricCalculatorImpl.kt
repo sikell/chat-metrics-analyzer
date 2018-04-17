@@ -11,6 +11,7 @@ import de.sikeller.tools.metrics.chat.utils.OperationResult
 import de.sikeller.tools.metrics.chat.utils.TimeCalculation
 import org.apache.commons.lang3.time.DateUtils
 import org.springframework.stereotype.Component
+import java.text.SimpleDateFormat
 import java.util.*
 
 @Component
@@ -66,9 +67,15 @@ class MetricCalculatorImpl(val emojiHandler: EmojiHandler) : MetricCalculator {
 
     private fun timeMetric(chat: Chat): TimeMetric = TimeMetric(
         communicationDensity = CommunicationDensity(
-            countPerDay = countPerDay(chat)
+            countPerDay = countPerDay(chat),
+            countPerTimeHour = countPerTimeHour(chat)
         )
     )
+
+    private fun countPerTimeHour(chat: Chat): Map<Int, Int> = chat.messages
+        .groupingBy { m -> SimpleDateFormat("HH").format(m.timestamp).toInt() }
+        .eachCount()
+        .toMap()
 
     private fun countPerDay(chat: Chat): Map<Date, Int> = chat.messages
         .groupingBy { m ->
