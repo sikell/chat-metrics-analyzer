@@ -68,6 +68,8 @@ class MetricCalculatorImpl(val emojiHandler: EmojiHandler) : MetricCalculator {
     private fun timeMetric(chat: Chat): TimeMetric = TimeMetric(
         communicationDensity = CommunicationDensity(
             countPerDay = countPerDay(chat),
+            countPerMonth = countPerMonth(chat),
+            countPerYear = countPerYear(chat),
             countPerTimeHour = countPerTimeHour(chat)
         )
     )
@@ -80,6 +82,18 @@ class MetricCalculatorImpl(val emojiHandler: EmojiHandler) : MetricCalculator {
     private fun countPerDay(chat: Chat): Map<Date, Int> = chat.messages
         .groupingBy { m ->
             DateUtils.truncate(m.timestamp, Calendar.DAY_OF_MONTH)
+        }.eachCount()
+        .toMap()
+
+    private fun countPerMonth(chat: Chat): Map<Date, Int> = chat.messages
+        .groupingBy { m ->
+            DateUtils.truncate(m.timestamp, Calendar.MONTH)
+        }.eachCount()
+        .toMap()
+
+    private fun countPerYear(chat: Chat): Map<Date, Int> = chat.messages
+        .groupingBy { m ->
+            DateUtils.truncate(m.timestamp, Calendar.YEAR)
         }.eachCount()
         .toMap()
 }
