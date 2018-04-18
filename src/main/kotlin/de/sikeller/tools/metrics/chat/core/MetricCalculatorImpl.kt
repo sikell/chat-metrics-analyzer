@@ -27,7 +27,16 @@ class MetricCalculatorImpl(val emojiHandler: EmojiHandler) : MetricCalculator {
     }
 
     private fun personMetric(chat: Chat): List<PersonMetric> {
-        val emojiMetric = emojiMetric(chat)
+        val emojiMetric: Map<String, List<EmojiMetric>> = emojiMetric(chat)
+        val messageLength: Map<String, Long?> = chat.messages
+            .groupingBy { m -> m.sender.name }
+            .aggregate { _, sum: Long?, message, first ->
+                if (first) {
+                    message.message.length.toLong()
+                } else {
+                    sum?.plus(message.message.length)
+                }
+            }
         return chat.messages
             .groupingBy { m -> m.sender }
             .eachCount()
@@ -35,6 +44,7 @@ class MetricCalculatorImpl(val emojiHandler: EmojiHandler) : MetricCalculator {
                 PersonMetric(
                     person = p.key,
                     messageCount = p.value.toLong(),
+                    messageLength = messageLength[p.key.name] ?: 0.toLong(),
                     emojiMetric = emojiMetric[p.key.name] ?: emptyList()
                 )
             }
