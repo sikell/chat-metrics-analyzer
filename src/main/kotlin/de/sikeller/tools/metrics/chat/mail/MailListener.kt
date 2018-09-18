@@ -46,6 +46,7 @@ class MailListener(
                 .map {
                     val fromAddresses = it.from
                     val content = it.content.toString()
+                    it.setFlag(Flags.Flag.SEEN, true)
                     Mail(
                         from = fromAddresses[0].toString(),
                         to = parseAddresses(it.getRecipients(RecipientType.TO)),
@@ -61,7 +62,7 @@ class MailListener(
             store.close()
             return mails
         } catch (ex: NoSuchProviderException) {
-            println("No provider for protocol: " + protocol)
+            println("No provider for protocol: $protocol")
             ex.printStackTrace()
             return emptyList()
         } catch (ex: MessagingException) {
@@ -73,8 +74,8 @@ class MailListener(
 
     private fun getServerProperties(protocol: String, host: String, port: String): Properties {
         val properties = Properties()
-        properties.put(String.format("mail.%s.host", protocol), host)
-        properties.put(String.format("mail.%s.port", protocol), port)
+        properties[String.format("mail.%s.host", protocol)] = host
+        properties[String.format("mail.%s.port", protocol)] = port
         properties.setProperty(String.format("mail.%s.socketFactory.class", protocol), "javax.net.ssl.SSLSocketFactory")
         properties.setProperty(String.format("mail.%s.socketFactory.fallback", protocol), "false")
         properties.setProperty(String.format("mail.%s.socketFactory.port", protocol), port)
@@ -98,14 +99,14 @@ class MailListener(
                     && bodyPart.disposition.toLowerCase() == Part.ATTACHMENT.toLowerCase()
                     && !StringUtils.isEmpty(bodyPart.fileName)
             }.map { bodyPart ->
-            val content = convertStreamToString(bodyPart.inputStream)
-            Attachment(
-                name = bodyPart.fileName,
-                contentType = bodyPart.contentType,
-                description = bodyPart.description,
-                content = content
-            )
-        }
+                val content = convertStreamToString(bodyPart.inputStream)
+                Attachment(
+                    name = bodyPart.fileName,
+                    contentType = bodyPart.contentType,
+                    description = bodyPart.description,
+                    content = content
+                )
+            }
     }
 
     private fun convertStreamToString(inputStream: InputStream): String {
