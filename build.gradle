@@ -32,6 +32,8 @@ dependencies {
     compile 'com.vdurmont:emoji-java:4.0.0'
     compile "org.springframework.boot:spring-boot-configuration-processor:$spring_boot_version"
     compile 'org.apache.commons:commons-lang3:3.7'
+    compile 'com.arangodb:arangodb-spring-data:3.1.0'
     testCompile "org.springframework.boot:spring-boot-starter-test:$spring_boot_version"
     testCompile 'io.kotlintest:kotlintest-runner-junit5:3.0.0'
+    compileOnly 'org.projectlombok:lombok:1.18.2'
 }
