@@ -8,6 +8,7 @@ import de.sikeller.tools.metrics.chat.mail.model.Mail
 import de.sikeller.tools.metrics.chat.persistence.EmailPersistenceService
 import de.sikeller.tools.metrics.chat.utils.OperationResult
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -24,11 +25,12 @@ class MailController(
     fun unreadMails(): List<Mail> = mailListener.getNewEmails()
         .onEach { emailPersistenceService.saveMail(it) }
 
-    @GetMapping("/analyze")
-    fun analyzeUnreadMails(): List<OperationResult<ChatMetric>> = mailListener.getNewEmails()
-        .onEach { emailPersistenceService.saveMail(it) }
-        .filter { it.attachments.size == 1 }
-        .flatMap { it.attachments }
-        .filter { it.name.startsWith("WhatsApp Chat ") && it.name.endsWith(".txt") }
-        .map { calculator.calc(transformer.transform(it.content)) }
+    @GetMapping("/analyze/{mailId}")
+    fun analyzeUnreadMails(@PathVariable mailId: String): List<OperationResult<ChatMetric>> {
+        val mail = emailPersistenceService.getMail(mailId)
+        if (!mail.isPresent || mail.get().attachments.size != 1) return emptyList()
+        return mail.get().attachments
+            .filter { it.name.startsWith("WhatsApp Chat ") && it.name.endsWith(".txt") }
+            .map { calculator.calc(transformer.transform(it.content)) }
+    }
 }
