@@ -2,8 +2,8 @@ package de.sikeller.tools.metrics.chat.persistence;
 
 import de.sikeller.tools.metrics.chat.mail.model.Attachment;
 import de.sikeller.tools.metrics.chat.mail.model.Mail;
-import de.sikeller.tools.metrics.chat.persistence.dao.AttachmentDao;
-import de.sikeller.tools.metrics.chat.persistence.dao.EmailDao;
+import de.sikeller.tools.metrics.chat.persistence.dao.mail.AttachmentDao;
+import de.sikeller.tools.metrics.chat.persistence.dao.mail.EmailDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

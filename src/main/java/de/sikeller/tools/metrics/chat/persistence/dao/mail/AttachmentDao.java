@@ -1,4 +1,4 @@
-package de.sikeller.tools.metrics.chat.persistence.dao;
+package de.sikeller.tools.metrics.chat.persistence.dao.mail;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
