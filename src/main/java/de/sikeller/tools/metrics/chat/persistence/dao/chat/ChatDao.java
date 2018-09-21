@@ -1,4 +1,4 @@
-package de.sikeller.tools.metrics.chat.persistence.dao.mail;
+package de.sikeller.tools.metrics.chat.persistence.dao.chat;
 
 import com.arangodb.springframework.annotation.Document;
 import lombok.AllArgsConstructor;
@@ -8,22 +8,18 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
 import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-@Document("emails")
-class EmailDao {
+@Document("chat")
+class ChatDao {
     @Id
     private String id;
-    private String from;
-    private String to;
-    private String cc;
-    private String subject;
-    private String sentDate;
-    private String message;
-    private List<AttachmentDao> attachments;
+    private List<MessageDao> messages;
+    private Set<PersonDao> persons;
 
     private boolean processed;
 }

@@ -1,36 +1,33 @@
 package de.sikeller.tools.metrics.chat.api
 
 import de.sikeller.tools.metrics.chat.core.ChatTransformer
-import de.sikeller.tools.metrics.chat.core.MetricCalculator
-import de.sikeller.tools.metrics.chat.core.model.ChatMetric
+import de.sikeller.tools.metrics.chat.core.model.Chat
 import de.sikeller.tools.metrics.chat.mail.MailListener
 import de.sikeller.tools.metrics.chat.mail.model.Mail
-import de.sikeller.tools.metrics.chat.persistence.EmailPersistenceService
-import de.sikeller.tools.metrics.chat.utils.OperationResult
+import de.sikeller.tools.metrics.chat.persistence.dao.chat.ChatPersistenceService
+import de.sikeller.tools.metrics.chat.persistence.dao.mail.EmailPersistenceService
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("mail")
+@RequestMapping("process")
 class MailController(
     val mailListener: MailListener,
     val transformer: ChatTransformer,
-    val calculator: MetricCalculator,
-    val emailPersistenceService: EmailPersistenceService
+    val emailPersistenceService: EmailPersistenceService,
+    val chatPersistenceService: ChatPersistenceService
 ) {
 
-    @GetMapping("/")
+    @GetMapping("/inbox")
     fun unreadMails(): List<Mail> = mailListener.getNewEmails()
         .onEach { emailPersistenceService.saveMail(it) }
 
-    @GetMapping("/analyze/{mailId}")
-    fun analyzeUnreadMails(@PathVariable mailId: String): List<OperationResult<ChatMetric>> {
-        val mail = emailPersistenceService.getMail(mailId)
-        if (!mail.isPresent || mail.get().attachments.size != 1) return emptyList()
-        return mail.get().attachments
-            .filter { it.name.startsWith("WhatsApp Chat ") && it.name.endsWith(".txt") }
-            .map { calculator.calc(transformer.transform(it.content)) }
-    }
+    @GetMapping("/mails")
+    fun extractChats(): List<Chat> = emailPersistenceService.retrieveUnprocessedMails()
+        .map { it.attachments }
+        .flatMap { it }
+        .filter { it.name.startsWith("WhatsApp Chat ") && it.name.endsWith(".txt") }
+        .map { transformer.transform(it.content) }
+        .onEach { chatPersistenceService.saveChat(it) }
 }
